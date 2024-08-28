@@ -1,5 +1,0 @@
-<hatml>
-  <head>
-    
-  </head>
-</hatml>
