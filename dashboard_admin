@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+        }
+        .sidebar {
+            height: 100%;
+            position: fixed;
+            width: 220px;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #ffffff;
+            display: block;
+        }
+        .sidebar a:hover {
+            background-color: #495057;
+            color: #ffffff;
+        }
+        .container {
+            margin-left: 240px;
+            padding-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -220px;
+                width: 220px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .container {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="text-center">Menu</h2>
+        <ul class="nav flex-column">
+            
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('absensi/data_karyawan'); ?>">Data Karyawan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('absensi/data_user'); ?>">Data User</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('absensi/data_jabatan'); ?>">Data Jabatan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('absensi/data_absen'); ?>">Data Absen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('absensi/keterangan'); ?>">Keterangan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="<?php echo site_url('login/logout'); ?>">Logout</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container mt-3">
+        <h1 class="mt-5">Dashboard Admin</h1>
+        <p>Selamat datang di dashboard admin. Ini adalah halaman kosong untuk admin.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
