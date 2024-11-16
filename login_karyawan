@@ -1,55 +1,29 @@
-
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
-<title>Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!-- Custom Theme files -->
-<link href="../css/style.css" rel="stylesheet" type="text/css" media="all" />
-<!-- //Custom Theme files -->
-<!-- web font -->
-<link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
-<!-- //web font -->
+    <meta charset="UTF-8">
+    <title>Login Karyawan</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-  <!-- main -->
-  <div class="main-w3layouts wrapper">
-    <h1>Login Karyawan</h1>
-    <div class="main-agileinfo">
-      <div class="agileits-top">
-        <form action="pro_login_karyawan.php" method="post">
-          <input class="text" type="text" name="username" placeholder="Username" required=""><br>
-        
-          <input class="text" type="password" name="password" placeholder="Password" required="">
-          <div class="wthree-text">
-            <label class="anim">
-            </label>
-            <div class="clear"> </div>
-          </div>
-          <input type="submit" value="Login">
+    <?php $this->load->view('header'); ?> <!-- Memuat menu header -->
+    
+    <div class="container">
+        <h1 class="mt-5">Login Karyawan</h1>
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger"><?php echo $error; ?></div>
+        <?php endif; ?>
+        <form action="<?php echo site_url('absensi/dashboard_karyawan'); ?>" method="post">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
         </form>
-        
-      </div>
     </div>
-    <!-- copyright -->
-    <div class="colorlibcopy-agile">
-    </div>
-    <!-- //copyright -->
-    <ul class="colorlib-bubbles">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-  </div>
-  <!-- //main -->
 </body>
 </html>
