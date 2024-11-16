@@ -1,29 +1,267 @@
 <!DOCTYPE html>
 <html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login Karyawan</title>
+    <title>Absensi Karyawan</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .header {
+            background-color: #3c3c3c;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .absen-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .camera-container {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-container {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-weight: normal;
+            color: #333;
+        }
+
+        .info-value {
+            color: #666;
+        }
+
+        .nup-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .nup-input.error {
+            border-color: #dc3545;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .submit-btn {
+            background-color: #3c3c3c;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .submit-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            background-color: #000;
+        }
+
+        
+    </style>
 </head>
 <body>
-    <?php $this->load->view('header'); ?> <!-- Memuat menu header -->
+    <div class="header">
+        <h2>ABSEN KARYAWAN</h2>
+    </div>
     
     <div class="container">
-        <h1 class="mt-5">Login Karyawan</h1>
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
-        <form action="<?php echo site_url('absensi/dashboard_karyawan'); ?>" method="post">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" name="username" required>
+        <div class="absen-container">
+            <!-- Camera Area -->
+            <div class="camera-container">
+                <video id="videoElement" autoplay></video>
+                <canvas id="canvas" style="display:none;"></canvas>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control" name="password" required>
+
+            <!-- Info Area -->
+            <div class="info-container">
+                <div class="form-group">
+                    <label class="info-label">NUP :</label>
+                    <input type="text" class="form-control nup-input" id="nup" name="nup" placeholder="Masukkan NUP">
+                    <div id="nup-error" class="error-message"></div>
+                </div>
+                <p><span class="info-label">Nama :</span> <span class="info-value" id="nama">-</span></p>
+                <p><span class="info-label">Waktu :</span> <span class="info-value" id="waktu">Auto</span></p>
             </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
+
+           <!-- Submit Button -->
+           <div class="text-center">
+                <button id="capture" class="submit-btn">Kirim absen</button>
+            </div>
+        </div>
     </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        // Inisialisasi elemen DOM
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const nupInput = document.getElementById('nup');
+        const namaSpan = document.getElementById('nama');
+        const nupError = document.getElementById('nup-error');
+        let timeout = null;
+
+        // Fungsi untuk menampilkan error
+        function showError(message) {
+            nupError.textContent = message;
+            nupError.classList.add('show');
+            nupInput.classList.add('error');
+            captureButton.disabled = true;
+        }
+
+        // Fungsi untuk menghapus error
+        function clearError() {
+            nupError.classList.remove('show');
+            nupInput.classList.remove('error');
+            nupError.textContent = '';
+        }
+
+        // Fungsi validasi NUP
+        function validateNUP(value) {
+            clearTimeout(timeout);
+            clearError();
+
+            // Validasi kosong
+            if (!value.trim()) {
+                showError('NUP tidak boleh kosong!');
+                return false;
+            }
+
+            // Validasi panjang minimal
+            if (value.length < 5) {
+                showError('NUP minimal 5 karakter!');
+                return false;
+            }
+
+            // Validasi hanya angka
+            if (!/^\d+$/.test(value)) {
+                showError('NUP hanya boleh berisi angka!');
+                return false;
+            }
+
+            // Cek NUP di database
+            timeout = setTimeout(() => {
+                $.ajax({
+                    url: '<?php echo site_url("karyawan/get_karyawan_by_nup/"); ?>' + value,
+                    type: 'GET',
+                    success: function(response) {
+                        const data = JSON.parse(response);
+                        if (!data) {
+                            showError('NUP tidak ditemukan dalam database!');
+                        } else {
+                            clearError();
+                            namaSpan.textContent = data.nama;
+                            captureButton.disabled = false;
+                        }
+                    },
+                    error: function() {
+                        showError('Terjadi kesalahan saat memverifikasi NUP!');
+                    }
+                });
+            }, 500);
+
+            return true;
+        }
+
+        // Event listeners
+        nupInput.addEventListener('input', (e) => validateNUP(e.target.value));
+        nupInput.addEventListener('blur', (e) => validateNUP(e.target.value));
+
+        // Mengakses kamera
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error("Camera error:", error);
+                });
+        }
+
+        // Update waktu otomatis
+        function updateWaktu() {
+            const waktuElement = document.getElementById('waktu');
+            const now = new Date();
+            waktuElement.textContent = now.toLocaleTimeString('id-ID');
+        }
+        setInterval(updateWaktu, 1000);
+        updateWaktu();
+
+        // Handle capture dan submit
+        captureButton.addEventListener('click', function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg');
+            const formData = new FormData();
+            formData.append('image', imageData);
+            formData.append('nup', nupInput.value);
+            formData.append('nama', namaSpan.textContent);
+            formData.append('waktu', document.getElementById('waktu').textContent);
+
+            fetch('<?php echo site_url("absen/simpan"); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Absensi berhasil disimpan!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menyimpan absensi');
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
